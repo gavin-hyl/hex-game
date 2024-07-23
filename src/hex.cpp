@@ -1,18 +1,18 @@
 #include "hex.hpp"
 
-#include <iostream>
-
-
+// odd-q offset coordinates
 Hex::Hex(int u, int v, int w)
-    : u(u), v(v), w(w) {
-        assert(u + v + w == 0);
+    : u(u), v(v), w(w), row(v + (u - (u & 1)) / 2), col(u) {
+    if (u + v + w != 0) {
+        throw std::invalid_argument("u + v + w must be 0");
+    }
 }
 
 Hex::Hex(int u, int v)
-    : u(u), v(v), w(-u - v) {}
+    : Hex(u, v, -u-v) {}
 
 int Hex::distance(const struct Hex& b) const {
-    return std::max({abs(u - b.u), abs(v - b.v), abs(w - b.w)});
+    return (std::abs(u - b.u) + std::abs(v - b.v) + std::abs(w - b.w)) / 2;
 }
 
 bool Hex::is_neighbor(const struct Hex& b) const {

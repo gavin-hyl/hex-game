@@ -4,6 +4,6 @@
 
 int main(int argc, char const *argv[])
 {
-    std::cout << "Hello, World!" << std::endl;
-    return 0;
+    Game game(5, 2);
+    game.board.print();
 }

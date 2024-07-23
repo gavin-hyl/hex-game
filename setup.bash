@@ -8,3 +8,4 @@ cmake ..
 make
 cd ../bin
 ./Game
+rm Game

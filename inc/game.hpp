@@ -9,16 +9,18 @@
 #include "rng.hpp"
 #include "ui.hpp"
 #include "tech.hpp"
+#include "board.hpp"
 
 struct Game {
-    std::vector<GameHex> board;
+    std::vector<GameHex> hexes;
+    Board board = Board();
     std::vector<Player> players;
     int current_player_idx = 0; 
     bool ended = false;
     const static std::vector<double> prod_distribution;
     const static std::vector<int> prod_values;
 
-    enum Action {
+    enum ACTION {
         ANNEX,
         ATTACK,
         DEFEND,
@@ -26,6 +28,7 @@ struct Game {
         END_TURN
     };
 
+    const static std::map<ACTION, int> action_costs;
 
     Game(int size, int players);
     
@@ -36,7 +39,10 @@ struct Game {
     void defend(GameHex& hex);
     void annex(GameHex& hex);
 
-    const Action parse_action() const;
+    const ACTION parse_action() const;
     const Tech& get_tech() const;
     const GameHex& get_hex() const;
+
+    Player& current_player() const;
+    const void next_player();
 };

@@ -1,6 +1,6 @@
 #include "tech.hpp"
 
-Tech EndGame("End Tech", "The game-ending technology", 0, {});
+Tech EndGame("End Tech", "You win", 0, {});
 Tech EconT2("Currency", "All tiles +1 gold", 10, {&EndGame});
 Tech EconT1("Metal Tools", "Production tiles +1 ", 10, {&EconT2});
 Tech EconT0("Organization", "Production tiles +1 ", 20, {&EconT1});
