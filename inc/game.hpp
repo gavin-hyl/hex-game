@@ -40,7 +40,7 @@ struct Game {
     bool attack();
     // bool research(Tech& tech);
 
-    const ACTION parse_action() const;
+    // const ACTION parse_action() const;
     const Tech& get_tech() const;
     GameHex& get_hex();
 

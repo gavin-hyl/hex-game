@@ -45,26 +45,35 @@ bool Game::next_turn() {
         const int prod = hex.production;
         player.gold += prod;
     }
+    if (player.gold > 30) {
+        std::cout << "Player " << current_player_idx << " wins!\n";
+        ended = true;
+        return false;
+    }
 
-    // free annex
+    std::string action;
+    std::map<std::string, std::function<bool()>> actions = {
+        {"annex", [this](){return this->annex();}},
+        {"sword", [this](){return this->add_sword();}},
+        {"shield", [this](){return this->add_shield();}},
+        {"attack", [this](){return this->attack();}},
+    };
+
     this->print();
-    std::cout << "Free annex\n";
-    this->annex();
     
-    // free sword
-    this->print();
-    std::cout << "Free sword\n";
-    this->add_sword();
-
-    // free shield
-    this->print();
-    std::cout << "Free shield\n";
-    this->add_shield();
-
-    // action phase
-    this->print();
-    std::cout << "Attack!\n";
-    this->attack();
+    while ((action = get_input("Action: ")) != "end")
+    {
+        if (actions.find(action) != actions.end()) {
+            if (actions[action]()) {
+                std::cout << action << " succeeded.\n";
+            } else {
+                std::cout << action << " failed.\n";
+            }
+        } else {
+            std::cout << "Invalid action.\n";
+        }
+        this->print();
+    }
 
     next_player();
 }
@@ -124,18 +133,6 @@ bool Game::attack()
     return true;
 }
 
-const Game::ACTION Game::parse_action() const {
-    std::string action = get_input("Input action: ");
-    if (action == "attack") {
-        return Game::ATTACK;
-    } else if (action == "defend") {
-        return Game::DEFEND;
-    } else if (action == "research") {
-        return Game::RESEARCH;
-    }
-    return Game::END_TURN;
-}
-
 const Tech& Game::get_tech() const {
     std::string tech_name = get_input("Input tech: ");
     Tech& tech = techs.find(tech_name)->second;
@@ -162,7 +159,7 @@ const void Game::next_player() {
 
 
 void Game::print() {
-    // clear_terminal();
+    clear_terminal();
     board.update_hexes(hexes);
     board.print();
     for (unsigned int i = 0; i < players.size(); i++) {

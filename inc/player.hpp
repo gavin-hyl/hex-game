@@ -20,15 +20,17 @@ struct Player {
     }
 
     friend std::ostream &operator<<(std::ostream &os, const Player &player) {
-        os << "Player(gold=" << player.gold << ", researched_techs=[";
-        for (const auto& tech : player.researched_techs) {
-            os << tech->name << ", ";
-        }
-        os << "], potential_techs=[";
-        for (const auto& tech : player.potential_techs) {
-            os << tech->name << ", ";
-        }
-        os << "])";
+        // os << "Player(gold=" << player.gold << ", researched_techs=[";
+        // for (const auto& tech : player.researched_techs) {
+        //     os << tech->name << ", ";
+        // }
+        // os << "], potential_techs=[";
+        // for (const auto& tech : player.potential_techs) {
+        //     os << tech->name << ", ";
+        // }
+        // os << "])";
+        // return os;
+        os << "Player(gold=" << player.gold << ")";
         return os;
     }
 };
