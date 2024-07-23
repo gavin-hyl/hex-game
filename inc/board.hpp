@@ -29,7 +29,7 @@ struct Board {
     void place_game_hex(const GameHex& hex);
 };
 
-const std::vector<std::string> HEXAGON = {
+const static std::vector<std::string> HEXAGON = {
     "  ______  ",
     " / 0000 \\ ",
     "/ 111111 \\",
@@ -37,4 +37,4 @@ const std::vector<std::string> HEXAGON = {
     " \\______/ "
 };
 
-const std::set<char> GRID_CHARS = {'\\', '_', '/'};
+const static std::set<char> GRID_CHARS = {'\\', '_', '/'};

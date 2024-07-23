@@ -1,14 +1,7 @@
 #include "game.hpp"
 
-const std::vector<double> Game::prod_distribution = {0.8, 0.15, 0.05};
+const std::vector<double> Game::prod_distribution = {0.85, 0.12, 0.03};
 const std::vector<int> Game::prod_values = {0, 1, 2};
-const std::map<Game::ACTION, int> Game::action_costs = {
-    {Game::ANNEX, 0},
-    {Game::ATTACK, 1},
-    {Game::DEFEND, 1},
-    {Game::RESEARCH, 1},
-    {Game::END_TURN, 0}
-};
 
 Game::Game(int size, int players) {
     for (int i = 0; i < players; i++) {
@@ -21,61 +14,80 @@ Game::Game(int size, int players) {
                 continue;
             }
             int owner = -1;
+            int prod = rng.rand_choose(prod_distribution, prod_values);
             if (i == 0 && j == -2) {
                 owner = 1;
+                prod = 1;
             } else if (i == 0 && j == 2) {
                 owner = 0;
+                prod = 1;
             }
-            int prod = random_distribution_choose(prod_distribution, prod_values);
             this->hexes.emplace_back(GameHex(i+size, j+size, prod, owner));
         }
     }
     this->board = Board(this->hexes);
 }
 
-
+// returns whether the game is still ongoing
 bool Game::next_turn() {
     Player& player = current_player();
-
+    int& gold = player.gold;
     // calculate gold production
     for (auto& hex: hexes) {
-        if (hex.owner != current_player_idx) {
-            continue;
+        if (hex.owner == current_player_idx) {
+            const int prod = hex.production;
+            gold += prod;
         }
-        const int prod = hex.production;
-        player.gold += prod;
     }
-    if (player.gold > 30) {
+    if (gold > win_gold) {
         std::cout << "Player " << current_player_idx << " wins!\n";
         ended = true;
         return false;
     }
+    std::set<std::string> free_actions = {ANNEX, SWORD, SHIELD};
 
-    std::string action;
-    std::map<std::string, std::function<bool()>> actions = {
-        {"annex", [this](){return this->annex();}},
-        {"sword", [this](){return this->add_sword();}},
-        {"shield", [this](){return this->add_shield();}},
-        {"attack", [this](){return this->attack();}},
-    };
 
-    this->print();
-    
-    while ((action = get_input("Action: ")) != "end")
+    std::string action_str;
+    while (1)
     {
-        if (actions.find(action) != actions.end()) {
-            if (actions[action]()) {
-                std::cout << action << " succeeded.\n";
-            } else {
-                std::cout << action << " failed.\n";
-            }
-        } else {
-            std::cout << "Invalid action.\n";
+        this->print();
+        std::cout << "Valid Actions\n";
+        for (const auto& [name, action] : actions) {
+            int cost = (free_actions.find(name) == free_actions.end()) ? actions[name].cost : 0;
+            std::cout << name << " (" << cost << ")\n";
+        }
+        std::cout << "end\n";
+        if ((action_str = get_input("Action: ")) == "end") {
+            break;
         }
         this->print();
+        if (actions.find(action_str) == actions.end()) {
+            std::cout << "Invalid action.\n";
+            continue;
+        }
+        PlayerAction& action = actions[action_str];
+        bool is_free = free_actions.find(action_str) != free_actions.end();
+        if (!is_free && gold < action.cost) {
+            std::cout << "Not enough gold.\n";
+            continue;
+        } 
+        free_actions.erase(action_str);
+        if (!is_free) {
+            gold -= action.cost;
+        }
+        std::string status_str = action.act_fn() ? "succeeded" : "failed";
+        std::cout << action_str << " " << status_str << ". Press enter to continue.\n";
+        std::cin.get();
     }
 
-    next_player();
+    for (auto& hex : hexes) {
+        if (hex.owner == 1 - current_player_idx) {
+            next_player();
+            return true;
+        }
+    }
+    std::cout << "Player " << current_player_idx << " wins.\n";
+    return false;
 }
 
 bool Game::annex()
@@ -96,7 +108,9 @@ bool Game::add_sword()
     GameHex& hex = Game::get_hex();
     if (hex.owner == current_player_idx && hex.swords < 3) {
         hex.swords += 1;
+        return true;
     }
+    return false;
 }
 
 
@@ -128,9 +142,24 @@ bool Game::attack()
         defender.shields -= 1;
     } else {
         defender.owner = current_player_idx;
-        defender.swords = 1;
+        defender.swords = 0;
     }
     return true;
+}
+
+bool Game::improve()
+{
+    std::cout << "Improve hex.\n";
+    GameHex& hex = Game::get_hex();
+    if (hex.owner == current_player_idx
+        && hex.production < hex.max_production
+        && hex.swords > 0 && hex.shields > 0) {
+        hex.production += 1;
+        hex.swords--;
+        hex.shields--;
+        return true;
+    }
+    return false;
 }
 
 const Tech& Game::get_tech() const {
@@ -146,6 +175,7 @@ GameHex& Game::get_hex() {
             return hex;
         }
     }
+    throw std::invalid_argument("Invalid hex");
 }
 
 Player& Game::current_player() const
@@ -162,7 +192,7 @@ void Game::print() {
     clear_terminal();
     board.update_hexes(hexes);
     board.print();
-    for (unsigned int i = 0; i < players.size(); i++) {
+    for (int i = 0, n = players.size(); i < n; i++) {
         if (i == current_player_idx) {
             std::cout << PLAYER_COLORS.at(i) << ">" << players.at(i) << RESET << "\n";
         } else {

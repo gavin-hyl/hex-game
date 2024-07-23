@@ -40,8 +40,11 @@ struct Hex
 struct GameHex : public Hex
 {
     int production = 0;
+    int max_production = 3;
     int shields = 0;
+    int max_shields = 3;
     int swords = 0;
+    int max_swords = 3;
     int owner = 0;
     GameHex(int u, int v, int production=0, int owner=-1);
 };

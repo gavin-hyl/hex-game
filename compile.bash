@@ -7,5 +7,3 @@ cd build
 cmake ..
 make
 cd ../bin
-./Game
-rm Game

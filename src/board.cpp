@@ -76,11 +76,9 @@ void Board::place_game_hex(const GameHex &hex)
     std::string prod = std::string(hex.production, '+');
     std::string atk = std::string(hex.swords, 'x');
     std::string def = std::string(hex.shields, 'o');
-    std::string color = GRAY;
-    if (hex.owner != -1) {
-        color = PLAYER_COLORS.at(hex.owner);
-    }
-    place_hexagon(hex.row, hex.col, {pos.str(), prod, atk, def}, {color, GREEN, RED, BLUE});
+    std::string pos_color = (hex.owner != -1) ? PLAYER_COLORS.at(hex.owner) : GRAY;
+    std::string prod_color = hex.owner == -1 ? WHITE : PLAYER_COLORS.at(hex.owner);
+    place_hexagon(hex.row, hex.col, {pos.str(), prod, atk, def}, {pos_color, prod_color, RED, BLUE});
 }
 
 void Board::print() const{
@@ -90,7 +88,7 @@ void Board::print() const{
         for (int col = 0; col < Board::GRID_WIDTH; col++) {
             char c = this->grid[row][col];
             if (GRID_CHARS.find(c) != GRID_CHARS.end()) {
-                std::cout << GRAY << c << RESET;
+                std::cout << GRAY << c;
             } else {
                 std::cout << this->grid_colors[row][col] << c;
             }
