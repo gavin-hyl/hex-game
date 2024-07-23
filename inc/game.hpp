@@ -31,18 +31,21 @@ struct Game {
     const static std::map<ACTION, int> action_costs;
 
     Game(int size, int players);
-    
     bool next_turn();
+    void print();
 
-    void attack(GameHex& defender);
-    void research(Tech& tech);
-    void defend(GameHex& hex);
-    void annex(GameHex& hex);
+    bool annex();
+    bool add_shield();
+    bool add_sword();
+    bool attack();
+    // bool research(Tech& tech);
 
     const ACTION parse_action() const;
     const Tech& get_tech() const;
-    const GameHex& get_hex() const;
+    GameHex& get_hex();
 
     Player& current_player() const;
     const void next_player();
+
+    bool accessible(const GameHex& hex, int dist=1) const;
 };

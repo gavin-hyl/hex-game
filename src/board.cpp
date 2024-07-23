@@ -7,15 +7,10 @@ Board::Board(std::vector<GameHex> hexes) {
             Board::grid_colors[row][col] = RESET;
         }
     }
-    for (auto hex : hexes) {
-        std::stringstream pos, prod, atk, def;
-        pos << "(" << std::string(1, (hex.u +'a')) << hex.v << ")";
-        prod << "  +" << hex.production;
-        atk << "A" << hex.attackers;
-        def << "D" << hex.defenders;
-        place_hexagon(hex.row, hex.col, {pos.str(), prod.str(), atk.str(), def.str(), ""}, {GRAY, GREEN, RED, BLUE});
-    }
+    update_hexes(hexes);
 }
+
+
 
 void Board::print_bound_line() {
     std::cout << "+";
@@ -32,7 +27,10 @@ const std::vector<std::string>& colors) {
     if (col & 1) {
         grid_start_row += HEX_HEIGHT_OFFSET / 2;
     }
-    unsigned int txt_cnt = 0;
+    
+    unsigned int txt_char_idx = 0;
+    unsigned int curr_idx = 0;
+
     for (unsigned int hrow = 0; hrow < HEXAGON.size(); hrow++) {
         for (unsigned int hcol = 0; hcol < HEXAGON[hrow].size(); hcol++) {
             int grid_row = grid_start_row + hrow;
@@ -46,25 +44,43 @@ const std::vector<std::string>& colors) {
                 continue;
             }
             if ((hex_char >= '0') && (hex_char <= '9')) {
+                // substitute hex_char if it's a digit
                 unsigned int index = hex_char - '0';
-                std::cerr << index << std::endl;
-                const std::string& txt = text.at(index);
-                if (txt_cnt < txt.size()) {
-                    grid_char = txt.at(txt_cnt);
-                    grid_color = colors.at(index);
-                    txt_cnt++;
+                // reset text if we're on a new index
+                if (curr_idx != index) {
+                    txt_char_idx = 0;
+                    curr_idx = index;
+                }
+                const std::string& txt = text.at(curr_idx);
+                if (txt_char_idx < txt.size()) {
+                    grid_char = txt.at(txt_char_idx);
+                    grid_color = colors.at(curr_idx);
+                    txt_char_idx++;
                 } else {
                     grid_char = ' ';
                     grid_color = RESET;
-                    txt_cnt = 0;
                 }
             } else {
                 grid_char = hex_char;
                 grid_color = RESET;
-                // txt_cnt = 0;
+                txt_char_idx = 0;
             }
         }
     }
+}
+
+void Board::place_game_hex(const GameHex &hex)
+{
+    std::stringstream pos;
+    pos << std::string(1, (hex.u +'a')) << "-" << hex.v;
+    std::string prod = std::string(hex.production, '+');
+    std::string atk = std::string(hex.swords, 'x');
+    std::string def = std::string(hex.shields, 'o');
+    std::string color = GRAY;
+    if (hex.owner != -1) {
+        color = PLAYER_COLORS.at(hex.owner);
+    }
+    place_hexagon(hex.row, hex.col, {pos.str(), prod, atk, def}, {color, GREEN, RED, BLUE});
 }
 
 void Board::print() const{
@@ -82,4 +98,11 @@ void Board::print() const{
         std::cout << "|\n";
     }
     Board::print_bound_line();
+}
+
+void Board::update_hexes(const std::vector<GameHex> &hexes)
+{
+    for (auto& hex : hexes) {
+        place_game_hex(hex);
+    }
 }

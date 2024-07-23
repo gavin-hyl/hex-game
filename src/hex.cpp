@@ -26,5 +26,12 @@ std::vector<Hex> Hex::neighbors() const {
     };
 }
 
-GameHex::GameHex(int u, int v, int production)
-    : Hex(u, v), production(production){ }
+std::string Hex::pos() const {
+    std::stringstream ss;
+    ss << std::string(1, (u +'a')) << "-" << v;
+    return ss.str();
+}
+
+
+GameHex::GameHex(int u, int v, int production, int owner)
+    : Hex(u, v), production(production), owner(owner){ }

@@ -2,15 +2,12 @@
 
 #include <random>
 #include <stdexcept>
+#include <ctime>
 
 
 template <typename T>
 T random_distribution_choose(const std::vector<double>& weights,
                              const std::vector<T>& values) {
-    std::random_device rd;
-    std::mt19937 rng(rd());
-
-    
     if (weights.size() != values.size()) {
         throw std::invalid_argument("weights and values must be the same size");
     } else if (weights.empty()) {
@@ -18,7 +15,7 @@ T random_distribution_choose(const std::vector<double>& weights,
     }
 
     double cdf = 0;
-    double rand = (double)rng() / rng.max();
+    double rand = (double)random() / RAND_MAX;
     for (unsigned int i = 0; i < weights.size(); i++) {
         cdf += weights.at(i);
         if (rand < cdf) {

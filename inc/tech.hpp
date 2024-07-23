@@ -13,9 +13,13 @@ struct Tech {
 
     Tech(std::string name, std::string description, int cost, std::initializer_list<Tech*> children)
         : name(name), description(description), cost(cost), children(children) {}
+    
+    friend std::ostream& operator<<(std::ostream& os, const Tech& tech) {
+        os << tech.name << " - " << tech.description << " - " << tech.cost;
+        return os;
+    }
 };
 
-#define CURRENCY "⬡"
 extern Tech EndGame;
 extern Tech EconT2;
 extern Tech EconT1;

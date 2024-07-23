@@ -1,12 +1,18 @@
 #pragma once
 
+#include <string>
+#include <vector>
+
 #define RESET       "\033[0m"
-#define BLACK       "\033[30m"      /* Black */
-#define RED         "\033[31m"      /* Red */
-#define GREEN       "\033[32m"      /* Green */
-#define YELLOW      "\033[33m"      /* Yellow */
-#define BLUE        "\033[34m"      /* Blue */
-#define MAGENTA     "\033[35m"      /* Magenta */
-#define CYAN        "\033[36m"      /* Cyan */
-#define WHITE       "\033[37m"      /* White */
-#define GRAY        "\033[2;37m"    /* Gray */
+#define BLACK       "\033[30m"
+#define RED         "\033[31m"
+#define GREEN       "\033[32m"
+#define YELLOW      "\033[33m"
+#define BLUE        "\033[34m"
+#define MAGENTA     "\033[35m"
+#define CYAN        "\033[36m"
+#define WHITE       "\033[37m"
+#define GRAY        "\033[2;37m"
+#define BOLD        "\033[1m"
+
+static const std::vector<std::string> PLAYER_COLORS = {MAGENTA, CYAN, YELLOW, GREEN, RED, BLUE};

@@ -3,6 +3,7 @@
 #include <vector>
 #include <iostream>
 #include <sstream>
+#include <string>
 #include <set>
 
 #include "hex.hpp"
@@ -19,18 +20,20 @@ struct Board {
     Board(std::vector<GameHex> hexes);
     Board() = default;
     void print() const;
+    void update_hexes(const std::vector<GameHex>& hexes);
 
     private:
     static void print_bound_line();
     void place_hexagon(int row, int col, const std::vector<std::string>& text,
                        const std::vector<std::string>& colors);
+    void place_game_hex(const GameHex& hex);
 };
 
 const std::vector<std::string> HEXAGON = {
     "  ______  ",
     " / 0000 \\ ",
     "/ 111111 \\",
-    "\\ 22 333 /",
+    "\\ 222333 /",
     " \\______/ "
 };
 

@@ -3,15 +3,19 @@
 #include <cassert>
 #include <vector>
 #include <algorithm>
+#include <string>
+#include <sstream>
+
+#include "player.hpp"
 
 struct Hex
 {
-    // axial coordinates
+    // axial(cubic) coordinates
     int u;
     int v;
     int w;
 
-    // odd-r offset coordinates
+    // odd-q offset coordinates
     int row;
     int col;
 
@@ -27,18 +31,17 @@ struct Hex
         return row < b.row || (row == b.row && col < b.col);
     }
 
-    bool operator==(const Hex& b) const {
-        return u == b.u && v == b.v && w == b.w;
-    }
-
     std::vector<Hex> neighbors() const;
+
+    std::string pos() const;
 };
 
 
 struct GameHex : public Hex
 {
     int production = 0;
-    int defenders = 0;
-    int attackers = 0;
-    GameHex(int u, int v, int production=0);
+    int shields = 0;
+    int swords = 0;
+    int owner = 0;
+    GameHex(int u, int v, int production=0, int owner=-1);
 };

@@ -5,5 +5,10 @@
 int main(int argc, char const *argv[])
 {
     Game game(5, 2);
-    game.board.print();
+    game.print();
+    while (1)
+    {
+        game.next_turn();
+        game.print();
+    }
 }

@@ -1,7 +1,7 @@
 #include "game.hpp"
 
-const std::vector<double> Game::prod_distribution = {0.5, 0.25, 0.15, 0.1};
-const std::vector<int> Game::prod_values = {0, 1, 3, 5};
+const std::vector<double> Game::prod_distribution = {0.8, 0.15, 0.05};
+const std::vector<int> Game::prod_values = {0, 1, 2};
 const std::map<Game::ACTION, int> Game::action_costs = {
     {Game::ANNEX, 0},
     {Game::ATTACK, 1},
@@ -20,8 +20,14 @@ Game::Game(int size, int players) {
             if (abs(i + j) > size) {
                 continue;
             }
+            int owner = -1;
+            if (i == 0 && j == -2) {
+                owner = 1;
+            } else if (i == 0 && j == 2) {
+                owner = 0;
+            }
             int prod = random_distribution_choose(prod_distribution, prod_values);
-            this->hexes.emplace_back(GameHex(i+size, j+size, prod));
+            this->hexes.emplace_back(GameHex(i+size, j+size, prod, owner));
         }
     }
     this->board = Board(this->hexes);
@@ -29,77 +35,93 @@ Game::Game(int size, int players) {
 
 
 bool Game::next_turn() {
-    next_player();
     Player& player = current_player();
 
     // calculate gold production
-    for (auto hex_p: player.owned_hexes) {
-        const int prod = hex_p->production;
+    for (auto& hex: hexes) {
+        if (hex.owner != current_player_idx) {
+            continue;
+        }
+        const int prod = hex.production;
         player.gold += prod;
-        if (player.researched(EconT0) && prod > 0) {
-            player.gold += 1;
-        }
-        if (player.researched(EconT1) && prod > 0) {
-            player.gold += 1;
-        }
-        if (player.researched(EconT2)) {
-            player.gold += 1;
-        }
     }
 
-    // free attack
-    if (player.researched(AttackT2)) {
-    }
+    // free annex
+    this->print();
+    std::cout << "Free annex\n";
+    this->annex();
+    
+    // free sword
+    this->print();
+    std::cout << "Free sword\n";
+    this->add_sword();
 
-    // free defense
-    if (player.researched(DefenseT2)) {
-    }
+    // free shield
+    this->print();
+    std::cout << "Free shield\n";
+    this->add_shield();
 
-    ACTION action;
-    while ((action = parse_action()) != ACTION::END_TURN) {
-        // check for victory
-        if (player.researched(EndGame)) {
-            ended = true;
-            return true;
-        }
+    // action phase
+    this->print();
+    std::cout << "Attack!\n";
+    this->attack();
 
-        if (action == ACTION::RESEARCH) {
-            Tech tech = get_tech();
-            research(tech);
-        } else if (action == ACTION::ATTACK) {
-        } else if (action == ACTION::DEFEND) {
-        } else if (action == ACTION::ANNEX) {
-        }
-        
+    next_player();
+}
+
+bool Game::annex()
+{
+    std::cout << "Annex hex.\n";
+    GameHex& hex = Game::get_hex();
+    if (accessible(hex) && hex.owner == -1) {
+        hex.owner = current_player_idx;
+        return true;
     }
     return false;
 }
 
-void Game::attack(GameHex &defender)
+
+bool Game::add_sword()
 {
-    Player& current_player = players.at(current_player_idx);
-    if (current_player.gold < ACTION::ATTACK) {
-        return;
+    std::cout << "On hex\n";
+    GameHex& hex = Game::get_hex();
+    if (hex.owner == current_player_idx && hex.swords < 3) {
+        hex.swords += 1;
     }
-    current_player.gold -= ACTION::ATTACK;
-    defender.attackers += 1;
-    current_player.gold -= defender.production;
 }
 
-void Game::research(Tech &tech)
-{
-}
 
-void Game::defend(GameHex &hex)
+bool Game::add_shield()
 {
-}
-
-void Game::annex(GameHex &hex)
-{
-    Player& current_player = players.at(current_player_idx);
-    if (current_player.gold < hex.production) {
-        return;
+    std::cout << "Add defender to hex.\n";
+    GameHex& hex = Game::get_hex();
+    if (hex.owner == current_player_idx && hex.shields < 3) {
+        hex.shields += 1;
+        return true;
     }
+    return false;
+}
+
+bool Game::attack()
+{
+    std::cout << "Attack!.\n";
+    std::cout << "From hex\n";
+    GameHex& attacker = Game::get_hex();
+    std::cout << "To hex\n";
+    GameHex& defender = Game::get_hex();
+    if (attacker.owner != current_player_idx 
+        || !attacker.is_neighbor(defender)
+        || attacker.swords == 0) {
+        return false;
+    }
+    attacker.swords -= 1;
+    if (defender.shields > 0) {
+        defender.shields -= 1;
+    } else {
+        defender.owner = current_player_idx;
+        defender.swords = 1;
+    }
+    return true;
 }
 
 const Game::ACTION Game::parse_action() const {
@@ -120,8 +142,13 @@ const Tech& Game::get_tech() const {
     return tech;
 }
 
-const GameHex& Game::get_hex() const {
-    return hexes.at(0);
+GameHex& Game::get_hex() {
+    std::string hex_name = get_input("coords: ");
+    for (GameHex& hex : hexes) {
+        if (hex.pos() == hex_name) {
+            return hex;
+        }
+    }
 }
 
 Player& Game::current_player() const
@@ -129,7 +156,29 @@ Player& Game::current_player() const
     return const_cast<Player&>(players.at(current_player_idx));
 }
 
-const void Game::next_player()
-{
+const void Game::next_player() {
     current_player_idx = (current_player_idx + 1) % players.size();
+}
+
+
+void Game::print() {
+    // clear_terminal();
+    board.update_hexes(hexes);
+    board.print();
+    for (unsigned int i = 0; i < players.size(); i++) {
+        if (i == current_player_idx) {
+            std::cout << PLAYER_COLORS.at(i) << ">" << players.at(i) << RESET << "\n";
+        } else {
+            std::cout << PLAYER_COLORS.at(i) << players.at(i) << RESET << "\n";
+        }
+    }
+}
+
+bool Game::accessible(const GameHex& hex, int dist) const {
+    for (const GameHex& h : hexes) {
+        if (h.owner == current_player_idx && h.distance(hex) <= dist) {
+            return true;
+        }
+    }
+    return false;
 }
