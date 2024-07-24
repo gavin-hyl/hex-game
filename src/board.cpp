@@ -1,31 +1,43 @@
 #include "board.hpp"
 
-Board::Board(std::vector<GameHex> hexes) {
-    for (int row = 0; row < GRID_HEIGHT; row++) {
-        for (int col = 0; col < GRID_WIDTH; col++) {
-            Board::grid[row][col] = ' ';
-            Board::grid_colors[row][col] = RESET;
-        }
-    }
-    update_hexes(hexes);
+Board::Board(std::vector<GameHex> hexes, bool compact) {
+    hex_width = compact ? HEX_WIDTH_COMPACT : HEX_WIDTH_SPACED;
+    hex_height = compact ? HEX_HEIGHT_COMPACT : HEX_HEIGHT_SPACED;
+    this->hexes = hexes;
+    reset_canvas();
 }
-
 
 
 void Board::print_bound_line() {
     std::cout << "+";
-    for (int col = 0; col < GRID_WIDTH; col++) {
+    for (int col = 0; col < CANVAS_WIDTH; col++) {
         std::cout << "-";
     }
     std::cout << "+\n";
 }
 
-void Board::place_hexagon(int row, int col, const std::vector<std::string>& text, 
-const std::vector<std::string>& colors) {
-    int grid_start_col = col * HEX_WIDTH_OFFSET;
-    int grid_start_row = row * HEX_HEIGHT_OFFSET;
+void Board::reset_canvas() {
+    for (int row = 0; row < CANVAS_HEIGHT; row++) {
+        for (int col = 0; col < CANVAS_WIDTH; col++) {
+            canvas[row][col] = ' ';
+            canvas_colors[row][col] = RESET;
+        }
+    }
+}
+
+void Board::update_canvas() {
+    reset_canvas();
+    for (const GameHex& hex : hexes) {
+        place_game_hex(hex);
+    }
+}
+void Board::place_hexagon(int row, int col,
+                          const std::vector<std::string>& text, 
+                          const std::vector<std::string>& colors) {
+    int grid_start_col = col * hex_width;
+    int grid_start_row = row * hex_height;
     if (col & 1) {
-        grid_start_row += HEX_HEIGHT_OFFSET / 2;
+        grid_start_row += hex_height / 2;
     }
     
     unsigned int txt_char_idx = 0;
@@ -36,10 +48,10 @@ const std::vector<std::string>& colors) {
             int grid_row = grid_start_row + hrow;
             int grid_col = grid_start_col + hcol;
             char hex_char = HEXAGON[hrow][hcol];
-            char& grid_char = grid[grid_start_row + hrow][grid_start_col + hcol];
-            std::string& grid_color = grid_colors[grid_start_row + hrow][grid_start_col + hcol];
-            if (grid_row < 0 || grid_row >= GRID_HEIGHT     // check bounds
-                || grid_col < 0 || grid_col >= GRID_WIDTH
+            char& grid_char = canvas[grid_start_row + hrow][grid_start_col + hcol];
+            std::string& grid_color = canvas_colors[grid_start_row + hrow][grid_start_col + hcol];
+            if (grid_row < 0 || grid_row >= CANVAS_HEIGHT     // check bounds
+                || grid_col < 0 || grid_col >= CANVAS_WIDTH
                 || hex_char == ' ') {     // don't overwrite
                 continue;
             }
@@ -76,31 +88,26 @@ void Board::place_game_hex(const GameHex &hex)
     std::string prod = std::string(hex.production, '+');
     std::string atk = std::string(hex.swords, 'x');
     std::string def = std::string(hex.shields, 'o');
-    std::string pos_color = (hex.owner != -1) ? PLAYER_COLORS.at(hex.owner) : GRAY;
-    std::string prod_color = hex.owner == -1 ? WHITE : PLAYER_COLORS.at(hex.owner);
+    std::string pos_color = GRAY;
+    std::string prod_color = GRAY;
+    if (hex.owner != -1) {
+        pos_color = PLAYER_COLORS.at(hex.owner);
+        prod_color = YELLOW;
+    }
     place_hexagon(hex.row, hex.col, {pos.str(), prod, atk, def}, {pos_color, prod_color, RED, BLUE});
 }
 
-void Board::print() const{
-    Board::print_bound_line();
-    for (int row = 0; row < Board::GRID_HEIGHT; row++) {
+void Board::print() {
+    print_bound_line();
+    update_canvas();
+    for (int row = 0; row < Board::CANVAS_HEIGHT; row++) {
         std::cout << "|";
-        for (int col = 0; col < Board::GRID_WIDTH; col++) {
-            char c = this->grid[row][col];
-            if (GRID_CHARS.find(c) != GRID_CHARS.end()) {
-                std::cout << GRAY << c;
-            } else {
-                std::cout << this->grid_colors[row][col] << c;
-            }
+        for (int col = 0; col < Board::CANVAS_WIDTH; col++) {
+            char c = this->canvas[row][col];
+            color_t color = (GRID_CHARS.find(c) != GRID_CHARS.end()) ? GRAY : this->canvas_colors[row][col];
+            std::cout << color << c;
         }
-        std::cout << "|\n";
+        std::cout << RESET << "|\n";
     }
-    Board::print_bound_line();
-}
-
-void Board::update_hexes(const std::vector<GameHex> &hexes)
-{
-    for (auto& hex : hexes) {
-        place_game_hex(hex);
-    }
+    print_bound_line();
 }

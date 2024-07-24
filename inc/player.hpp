@@ -30,7 +30,7 @@ struct Player {
         // }
         // os << "])";
         // return os;
-        os << "Player(gold=" << player.gold << ")";
+        os << "Player [" << player.gold << "G]";
         return os;
     }
 };

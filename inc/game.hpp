@@ -14,52 +14,58 @@
 struct PlayerAction {
     int cost;
     std::function<bool()> act_fn;
+    std::string cost_description;
+    std::string description;
 };
 
-static const std::string ANNEX = "annex";
-static const std::string ATTACK = "attack";
-static const std::string SWORD = "sword";
-static const std::string SHIELD = "shield";
-static const std::string IMPROVE = "improve";
+static const std::string ANNEX = "e";
+static const std::string ATTACK = "a";
+static const std::string SWORD = "x";
+static const std::string SHIELD = "o";
+static const std::string IMPROVE = "+";
 static const std::vector<std::string> action_strings = {ANNEX, ATTACK, SWORD, SHIELD, IMPROVE};
 
-struct Game {
-    std::vector<GameHex> hexes;
-    Board board = Board();
-    std::vector<Player> players;
-    int current_player_idx = 0; 
-    int win_gold = 30;
-    bool ended = false;
-    const static std::vector<double> prod_distribution;
-    const static std::vector<int> prod_values;
-    Randomizer rng = Randomizer();
+class Game {
+    public:
+        Game(int size, int players = 2);
+        bool next_turn();
+        void print();
 
-    std::map<std::string, PlayerAction> actions = {
-        {ANNEX, PlayerAction(5, [this](){return this->annex();})},
-        {SWORD, PlayerAction(5, [this](){return this->add_sword();})},
-        {SHIELD, PlayerAction(5, [this](){return this->add_shield();})},
-        {ATTACK, PlayerAction(0, [this](){return this->attack();})},
-        {IMPROVE, PlayerAction(0, [this](){return this->improve();})},
-    };
+    private:
+        Board board = Board();
+        std::vector<Player> players;
+        const int NO_PLAYER = -1;
+        int current_player_idx = 0; 
+        int win_gold = 30;
+        int turn = 0;
+        bool ended = false;
+        const static std::vector<double> prod_distribution;
+        const static std::vector<int> prod_values;
+        Randomizer rng = Randomizer();
 
-    Game(int size, int players);
-    bool next_turn();
-    void print();
+        std::map<std::string, PlayerAction> actions = {
+            {ANNEX, PlayerAction(5, [this](){return this->annex();}, COLOR(YELLOW, "5G"), "Annex a hex")},
+            {SWORD, PlayerAction(5, [this](){return this->add_sword();}, COLOR(YELLOW, "5G"), "Add a sword to a hex")},
+            {SHIELD, PlayerAction(5, [this](){return this->add_shield();}, COLOR(YELLOW, "5G"), "Add a shield to a hex")},
+            {ATTACK, PlayerAction(0, [this](){return this->attack();}, COLOR(RED, "x"), "Attack a hex")},
+            {IMPROVE, PlayerAction(0, [this](){return this->improve();}, COLOR(BLUE, "oo"), "Increase production of a hex by 1")},
+        };
 
-    bool annex();
-    bool add_shield();
-    bool add_sword();
-    bool attack();
-    bool improve();
 
-    // bool research(Tech& tech);
+        bool annex();
+        bool add_shield();
+        bool add_sword();
+        bool attack();
+        bool improve();
 
-    // const ACTION parse_action() const;
-    const Tech& get_tech() const;
-    GameHex& get_hex();
+        // bool research(Tech& tech);
 
-    Player& current_player() const;
-    const void next_player();
+        // const ACTION parse_action() const;
+        const Tech& get_tech() const;
+        GameHex& get_hex();
 
-    bool accessible(const GameHex& hex, int dist=1) const;
+        Player& current_player() const;
+        const void next_player();
+
+        bool accessible(const GameHex& hex, int dist=1) const;
 };

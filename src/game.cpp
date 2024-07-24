@@ -13,7 +13,7 @@ Game::Game(int size, int players) {
             if (abs(i + j) > size) {
                 continue;
             }
-            int owner = -1;
+            int owner = NO_PLAYER;
             int prod = rng.rand_choose(prod_distribution, prod_values);
             if (i == 0 && j == -2) {
                 owner = 1;
@@ -22,10 +22,9 @@ Game::Game(int size, int players) {
                 owner = 0;
                 prod = 1;
             }
-            this->hexes.emplace_back(GameHex(i+size, j+size, prod, owner));
+            board.hexes.emplace_back(GameHex(i+size, j+size, prod, owner));
         }
     }
-    this->board = Board(this->hexes);
 }
 
 // returns whether the game is still ongoing
@@ -33,7 +32,7 @@ bool Game::next_turn() {
     Player& player = current_player();
     int& gold = player.gold;
     // calculate gold production
-    for (auto& hex: hexes) {
+    for (auto& hex: board.hexes) {
         if (hex.owner == current_player_idx) {
             const int prod = hex.production;
             gold += prod;
@@ -53,8 +52,8 @@ bool Game::next_turn() {
         this->print();
         std::cout << "Valid Actions\n";
         for (const auto& [name, action] : actions) {
-            int cost = (free_actions.find(name) == free_actions.end()) ? actions[name].cost : 0;
-            std::cout << name << " (" << cost << ")\n";
+            std::string cost = (free_actions.find(name) == free_actions.end()) ? actions[name].cost_description : "free";
+            std::cout << name << " (cost: " << cost << ")" << " - " << action.description << "\n";
         }
         std::cout << "end\n";
         if ((action_str = get_input("Action: ")) == "end") {
@@ -80,13 +79,14 @@ bool Game::next_turn() {
         std::cin.get();
     }
 
-    for (auto& hex : hexes) {
+    for (auto& hex : board.hexes) {
         if (hex.owner == 1 - current_player_idx) {
             next_player();
             return true;
         }
     }
     std::cout << "Player " << current_player_idx << " wins.\n";
+    turn++;
     return false;
 }
 
@@ -94,7 +94,7 @@ bool Game::annex()
 {
     std::cout << "Annex hex.\n";
     GameHex& hex = Game::get_hex();
-    if (accessible(hex) && hex.owner == -1) {
+    if (accessible(hex) && hex.owner == NO_PLAYER) {
         hex.owner = current_player_idx;
         return true;
     }
@@ -141,7 +141,7 @@ bool Game::attack()
     if (defender.shields > 0) {
         defender.shields -= 1;
     } else {
-        defender.owner = current_player_idx;
+        defender.owner = (defender.owner == NO_PLAYER) ? current_player_idx : NO_PLAYER;
         defender.swords = 0;
     }
     return true;
@@ -170,7 +170,7 @@ const Tech& Game::get_tech() const {
 GameHex& Game::get_hex() {
     while (1) {
         std::string hex_name = get_input("coords: ");
-        for (GameHex& hex : hexes) {
+        for (GameHex& hex : board.hexes) {
             if (hex.pos() == hex_name) {
                 return hex;
             }
@@ -191,19 +191,23 @@ const void Game::next_player() {
 
 void Game::print() {
     clear_terminal();
-    board.update_hexes(hexes);
     board.print();
     for (int i = 0, n = players.size(); i < n; i++) {
-        if (i == current_player_idx) {
-            std::cout << PLAYER_COLORS.at(i) << ">" << players.at(i) << RESET << "\n";
-        } else {
-            std::cout << PLAYER_COLORS.at(i) << players.at(i) << RESET << "\n";
+        int income = 0;
+        for (const GameHex& hex : board.hexes) {
+            if (hex.owner == i) {
+                income += hex.production;
+            }
         }
+        std::string indicator = (i == current_player_idx) ? ">" : " ";
+        std::cout << PLAYER_COLORS.at(i) << indicator << players.at(i);
+        std::cout << " [+" << income << "G]";
+        std::cout << RESET << "\n";
     }
 }
 
 bool Game::accessible(const GameHex& hex, int dist) const {
-    for (const GameHex& h : hexes) {
+    for (const GameHex& h : board.hexes) {
         if (h.owner == current_player_idx && h.distance(hex) <= dist) {
             return true;
         }

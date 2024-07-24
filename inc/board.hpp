@@ -9,24 +9,35 @@
 #include "hex.hpp"
 #include "colors.hpp"
 
-struct Board {
-    const static int GRID_WIDTH = 120;
-    const static int GRID_HEIGHT = 60;
-    const static int HEX_HEIGHT_OFFSET = 4; // 5 for spaced hexes
-    const static int HEX_WIDTH_OFFSET = 8; // 10 for spaced hexes
-    char grid[GRID_HEIGHT][GRID_WIDTH];
-    std::string grid_colors[GRID_HEIGHT][GRID_WIDTH];
-
-    Board(std::vector<GameHex> hexes);
-    Board() = default;
-    void print() const;
-    void update_hexes(const std::vector<GameHex>& hexes);
+class Board {
+    public:
+        explicit Board(std::vector<GameHex> hexes = {},
+                      bool compact = true);
+        void print();
+        std::vector<GameHex> hexes;
 
     private:
-    static void print_bound_line();
-    void place_hexagon(int row, int col, const std::vector<std::string>& text,
-                       const std::vector<std::string>& colors);
-    void place_game_hex(const GameHex& hex);
+        // canvas is a 2D array of characters that represents the game board
+        const static int CANVAS_HEIGHT = 60;
+        const static int CANVAS_WIDTH = 150;
+        char canvas[CANVAS_HEIGHT][CANVAS_WIDTH];
+        color_t canvas_colors[CANVAS_HEIGHT][CANVAS_WIDTH];
+
+        // settings for hexagon placement
+        const static int HEX_HEIGHT_COMPACT = 4;
+        const static int HEX_WIDTH_COMPACT = 8;
+        const static int HEX_HEIGHT_SPACED = 5;
+        const static int HEX_WIDTH_SPACED = 10;
+        size_t hex_width, hex_height;
+        
+        void print_bound_line();
+
+        void reset_canvas();
+        void update_canvas();
+        void place_game_hex(const GameHex& hex);
+        void place_hexagon(int row, int col,
+                           const std::vector<std::string>& text, 
+                           const std::vector<color_t>& colors);
 };
 
 const static std::vector<std::string> HEXAGON = {
