@@ -12,8 +12,8 @@
 struct Board {
     const static int GRID_WIDTH = 120;
     const static int GRID_HEIGHT = 60;
-    const static int HEX_HEIGHT_OFFSET = 4;
-    const static int HEX_WIDTH_OFFSET = 8;
+    const static int HEX_HEIGHT_OFFSET = 4; // 5 for spaced hexes
+    const static int HEX_WIDTH_OFFSET = 8; // 10 for spaced hexes
     char grid[GRID_HEIGHT][GRID_WIDTH];
     std::string grid_colors[GRID_HEIGHT][GRID_WIDTH];
 

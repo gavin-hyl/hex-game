@@ -153,10 +153,9 @@ bool Game::improve()
     GameHex& hex = Game::get_hex();
     if (hex.owner == current_player_idx
         && hex.production < hex.max_production
-        && hex.swords > 0 && hex.shields > 0) {
+        && hex.shields >= 2) {
         hex.production += 1;
-        hex.swords--;
-        hex.shields--;
+        hex.shields -= 2;
         return true;
     }
     return false;
@@ -169,13 +168,15 @@ const Tech& Game::get_tech() const {
 }
 
 GameHex& Game::get_hex() {
-    std::string hex_name = get_input("coords: ");
-    for (GameHex& hex : hexes) {
-        if (hex.pos() == hex_name) {
-            return hex;
+    while (1) {
+        std::string hex_name = get_input("coords: ");
+        for (GameHex& hex : hexes) {
+            if (hex.pos() == hex_name) {
+                return hex;
+            }
         }
+        std::cout << "Invalid hex.\n";
     }
-    throw std::invalid_argument("Invalid hex");
 }
 
 Player& Game::current_player() const

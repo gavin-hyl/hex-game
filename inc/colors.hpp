@@ -3,6 +3,8 @@
 #include <string>
 #include <vector>
 
+using color_t = std::string;
+
 #define RESET       "\033[0m"
 #define BLACK       "\033[30m"
 #define RED         "\033[31m"
@@ -15,4 +17,4 @@
 #define GRAY        "\033[2;37m"
 #define BOLD        "\033[1m"
 
-static const std::vector<std::string> PLAYER_COLORS = {MAGENTA, CYAN, YELLOW, GREEN, RED, BLUE};
+static const std::vector<color_t> PLAYER_COLORS = {MAGENTA, GREEN, YELLOW, RED, BLUE};
