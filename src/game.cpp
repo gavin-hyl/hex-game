@@ -60,8 +60,8 @@ bool Game::next_turn() {
         this->print();
         std::cout << "Valid Actions\n";
         for (const auto& [name, action] : actions) {
-            std::string cost = (free_actions.find(name) == free_actions.end()) ? actions[name].cost_description : "free";
-            std::cout << name << " (cost: " << cost << ")" << " - " << action.description << "\n";
+            std::string cost = (free_actions.find(name) == free_actions.end()) ? action.cost_description : "free";
+            std::cout << name << " (" << cost << ")" << " - " << action.description << "\n";
         }
         std::cout << "end\n";
         if ((action_str = get_input("Action: ")) == "end") {
@@ -72,7 +72,7 @@ bool Game::next_turn() {
             std::cout << "Invalid action.\n";
             continue;
         }
-        PlayerAction& action = actions[action_str];
+        PlayerAction& action = const_cast<PlayerAction&>(actions.find(action_str)->second);
         bool is_free = free_actions.find(action_str) != free_actions.end();
         if (!is_free && gold < action.cost) {
             std::cout << "Not enough gold.\n";
