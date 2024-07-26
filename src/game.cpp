@@ -3,6 +3,14 @@
 const std::vector<double> Game::prod_distribution = {0.85, 0.12, 0.03};
 const std::vector<int> Game::prod_values = {0, 1, 2};
 
+const std::string Game::ANNEX = "annex";
+const std::string Game::ATTACK = "attack";
+const std::string Game::SWORD = "sword";
+const std::string Game::SHIELD = "shield";
+const std::string Game::IMPROVE = "improve";
+const std::string Game::TAKEOVER = "takeover";
+const std::vector<std::string> Game::action_strings = {Game::ANNEX, Game::ATTACK, Game::SWORD, Game::SHIELD, Game::IMPROVE, Game::TAKEOVER};
+
 Game::Game(int size, int players) {
     for (int i = 0; i < players; i++) {
         this->players.emplace_back(Player());
@@ -101,6 +109,23 @@ bool Game::annex()
     return false;
 }
 
+bool Game::takeover()
+{
+    std::cout << "Annex hex.\n";
+    std::cout << "From hex\n";
+    GameHex& from = Game::get_hex();
+    std::cout << "To hex\n";
+    GameHex& to = Game::get_hex();
+    if (from.owner == current_player_idx 
+        && to.owner == NO_PLAYER
+        && from.is_neighbor(to)
+        && from.swords >= 2) {
+        to.owner = current_player_idx;
+        from.swords -= 2;
+        return true;
+    }
+    return false;
+}
 
 bool Game::add_sword()
 {

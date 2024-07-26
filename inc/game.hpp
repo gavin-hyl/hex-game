@@ -18,13 +18,6 @@ struct PlayerAction {
     std::string description;
 };
 
-static const std::string ANNEX = "e";
-static const std::string ATTACK = "a";
-static const std::string SWORD = "x";
-static const std::string SHIELD = "o";
-static const std::string IMPROVE = "+";
-static const std::vector<std::string> action_strings = {ANNEX, ATTACK, SWORD, SHIELD, IMPROVE};
-
 class Game {
     public:
         Game(int size, int players = 2);
@@ -43,8 +36,17 @@ class Game {
         const static std::vector<int> prod_values;
         Randomizer rng = Randomizer();
 
-        std::map<std::string, PlayerAction> actions = {
+        static const std::string ANNEX;
+        static const std::string ATTACK;
+        static const std::string SWORD;
+        static const std::string SHIELD;
+        static const std::string IMPROVE;
+        static const std::string TAKEOVER;
+        static const std::vector<std::string> action_strings;
+
+        const std::map<std::string, PlayerAction> actions = {
             {ANNEX, PlayerAction(5, [this](){return this->annex();}, COLOR(YELLOW, "5G"), "Annex a hex")},
+            {TAKEOVER, PlayerAction(5, [this](){return this->annex();}, COLOR(RED, "xx"), "Take over a hex")},
             {SWORD, PlayerAction(5, [this](){return this->add_sword();}, COLOR(YELLOW, "5G"), "Add a sword to a hex")},
             {SHIELD, PlayerAction(5, [this](){return this->add_shield();}, COLOR(YELLOW, "5G"), "Add a shield to a hex")},
             {ATTACK, PlayerAction(0, [this](){return this->attack();}, COLOR(RED, "x"), "Attack a hex")},
@@ -53,6 +55,7 @@ class Game {
 
 
         bool annex();
+        bool takeover();
         bool add_shield();
         bool add_sword();
         bool attack();

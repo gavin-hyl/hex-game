@@ -11,8 +11,7 @@
 
 class Board {
     public:
-        explicit Board(std::vector<GameHex> hexes = {},
-                      bool compact = true);
+        Board(std::vector<GameHex> hexes = {}, bool compact = true);
         void print();
         std::vector<GameHex> hexes;
 
