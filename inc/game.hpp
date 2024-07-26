@@ -11,13 +11,6 @@
 #include "tech.hpp"
 #include "board.hpp"
 
-struct PlayerAction {
-    int cost;
-    std::function<bool()> act_fn;
-    std::string cost_description;
-    std::string description;
-};
-
 class Game {
     public:
         Game(int size, int players = 2);
@@ -43,6 +36,13 @@ class Game {
         static const std::string IMPROVE;
         static const std::string TAKEOVER;
         static const std::vector<std::string> action_strings;
+
+        struct PlayerAction {
+            int cost;
+            std::function<bool()> act_fn;
+            std::string cost_description;
+            std::string description;
+        };
 
         const std::map<std::string, PlayerAction> actions = {
             {ANNEX, PlayerAction(5, [this](){return this->annex();}, COLOR(YELLOW, "5G"), "Annex a hex")},
