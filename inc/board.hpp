@@ -15,7 +15,7 @@ class Board {
         Board(int size, bool compact = true);
         void print();
         std::vector<GameHex> hexes;
-        GameHex& get_hex(const HexPos& pos);
+        GameHex* get_hex(const HexPos& pos);
         std::vector<GameHex*> get_ring(HexPos center, int radius);
 
     private:

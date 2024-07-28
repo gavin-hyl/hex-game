@@ -11,6 +11,7 @@
 #include "tech.hpp"
 #include "board.hpp"
 #include "action.hpp"
+#include "graphs.hpp"
 
 
 class Game {
@@ -26,7 +27,7 @@ class Game {
         player_id_t current_id = 0;
         int turn = 0;
 
-        const static gold_t BASE_PROD = 3;
+        const static gold_t BASE_PROD = 1;
 
         const static player_id_t NO_PLAYER = -1;
         const static gold_t win_gold = 30;
@@ -41,7 +42,7 @@ class Game {
             {
                 "annex", 
                 PlayerAction(ActionCost(3, 0, 0),
-                            "Instantly gain control of a hex.",
+                            "Gain control of a hex.",
                             [this](){return this->check_annex();},
                             [this](){this->annex();})
             },

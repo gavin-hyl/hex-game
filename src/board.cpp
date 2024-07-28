@@ -94,11 +94,11 @@ bool Board::in_bounds(const HexPos &pos) const
     return (abs(pos.u + pos.v) <= size);
 }
 
-GameHex &Board::get_hex(const HexPos &pos)
+GameHex* Board::get_hex(const HexPos &pos)
 {
     for (GameHex &hex : hexes) {
         if (hex.pos == pos) {
-            return hex;
+            return &hex;
         }
     }
     throw std::invalid_argument("Invalid hex coords.");
@@ -112,7 +112,7 @@ std::vector<GameHex*> Board::get_ring(HexPos center, int radius)
     }
     std::vector<GameHex*> ring;
     if (radius == 0) {
-        ring.emplace_back(&get_hex(center));
+        ring.emplace_back(get_hex(center));
     } else {
         for (GameHex& hex : hexes) {
             if (center.distance(hex.pos) == radius) {

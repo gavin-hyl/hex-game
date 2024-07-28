@@ -1,7 +1,7 @@
 #include "graphs.hpp"
 
 template <typename T>
-std::set<T> connected(std::set<T> nodes, T start, std::function<std::vector<T>(T)> adjacent) {
+std::vector<T> connected(std::vector<T> nodes, T start, std::function<std::vector<T>(T)> adjacent) {
     std::set<T> frontier = {start};
     std::set<T> visited;
     while (!frontier.empty()) {

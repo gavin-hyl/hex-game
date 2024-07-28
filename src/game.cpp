@@ -17,7 +17,7 @@ Game::Game(int size, int players) {
     // generate board with player-specific information
     for (player_id_t i = 0; i < players; i++) {
         HexPos capital_pos = capitals.at(i);
-        GameHex& capital_hex = board.get_hex(capital_pos);
+        GameHex& capital_hex = *(board.get_hex(capital_pos));
         capital_hex.owner = i;
         capital_hex.capital = i;
         capital_hex.production = 3;
@@ -49,9 +49,7 @@ Game::Game(int size, int players) {
 // returns whether the game is still ongoing
 bool Game::next_turn() {
     Player& player = current_player();
-    gold_t& gold = player.gold;
-    // calculate gold production
-    gold += player_prodution(current_id);
+    player.gold += player_prodution(current_id);
 
     std::string action_str;
     while (1)
@@ -86,6 +84,7 @@ bool Game::next_turn() {
         }
         if (valid_actions.size() == 0) {
             std::cout << "No valid actions.\n";
+            wait();
             continue;
         }
         std::cout << "Valid actions:\n";
@@ -98,7 +97,41 @@ bool Game::next_turn() {
         incur(valid_actions[action_idx].cost);
     }
 
-    next_player();
+    for (player_id_t i = 0; i < players.size(); i++) {
+        if (i == current_id) {
+            continue;
+        }
+        GameHex* capital_hex = board.get_hex(capitals.at(i));
+        std::vector<GameHex*> frontier = {capital_hex};
+        std::vector<GameHex*> visited;
+        while (!frontier.empty())
+        {
+            GameHex* current_hex = frontier.front();
+            frontier.erase(frontier.begin());
+            visited.emplace_back(current_hex);
+            for (GameHex* hex : board.get_ring(current_hex->pos, 1)) {
+                if ((hex->owner == i) && (std::find(visited.begin(), visited.end(), hex) == visited.end())) {
+                    frontier.emplace_back(hex);
+                }
+            }
+
+            // testing
+            for (GameHex* hex : frontier) {
+                std::cout << hex->pos.str() << " ";
+            }
+            for (GameHex* hex : visited) {
+                std::cout << hex->pos.str() << " ";
+            }
+        }
+        for (GameHex& hex: board.hexes) {
+            if ((std::find(visited.begin(), visited.end(), &hex) == visited.end())
+                && (hex.owner == i)) {
+                hex.owner = NO_PLAYER;
+            }
+        }
+    }
+
+    current_id = (current_id + 1) % players.size();
     turn++;
     return false;
 }
@@ -157,8 +190,10 @@ void Game::attack()
 {
     std::cout << "Attack hex\n";
     GameHex& other_selected_hex = get_hex();
-    if (other_selected_hex.shields == 0) {
+    if (other_selected_hex.owner == NO_PLAYER) {
         other_selected_hex.owner = current_id;
+    } else if (other_selected_hex.shields == 0) {
+        other_selected_hex.owner = NO_PLAYER;
     } else {
         other_selected_hex.shields -= 1;
     }
@@ -166,8 +201,8 @@ void Game::attack()
 
 bool Game::check_improve()
 {
-    return (selected_hex->owner == current_id
-            && selected_hex->production < selected_hex->max_production);
+    return (selected_hex->owner == current_id)
+            && (selected_hex->production < selected_hex->max_production);
 }
 
 void Game::improve()
@@ -213,10 +248,6 @@ GameHex& Game::get_hex(std::string coords) {
 Player& Game::current_player() const
 {
     return const_cast<Player&>(players.at(current_id));
-}
-
-const void Game::next_player() {
-    current_id = (current_id + 1) % players.size();
 }
 
 gold_t Game::player_prodution(player_id_t id) const
