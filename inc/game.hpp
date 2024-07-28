@@ -22,6 +22,7 @@ class Game {
 
     private:
         Board board = Board();
+        Canvas canvas = Canvas();
         std::vector<Player> players;
         GameHex* selected_hex = nullptr;
         player_id_t current_id = 0;
@@ -99,7 +100,6 @@ class Game {
         GameHex& get_hex(std::string coords="");
 
         Player& current_player() const;
-        const void next_player();
         gold_t player_prodution(player_id_t id) const;
 
         bool accessible(const GameHex& hex, int dist=1) const;

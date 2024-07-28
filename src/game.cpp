@@ -63,7 +63,7 @@ bool Game::next_turn() {
             std::cout << "Actions:\n";
             for (const auto& [name, action] : actions) {
                 std::cout << COLOR(BOLD, name) << ": " << action.description << "\n";
-                std::cout << "Cost: " << action.cost.to_string() << "\n\n";
+                std::cout << "Cost: " << action.cost.to_string() << "\n";
             }
             wait();
             continue;
@@ -245,7 +245,7 @@ GameHex& Game::get_hex(std::string coords) {
     throw std::invalid_argument("Invalid hex coords.");
 }
 
-Player& Game::current_player() const
+inline Player& Game::current_player() const
 {
     return const_cast<Player&>(players.at(current_id));
 }
@@ -263,7 +263,8 @@ gold_t Game::player_prodution(player_id_t id) const
 
 void Game::print() {
     // clear_terminal();
-    board.print();
+    canvas.update(board.hexes);
+    canvas.print();
     std::cout << "Turn " << turn << "\n";
     std::cout << "Goal: " << win_gold << "G\n";
     for (int i = 0, n = players.size(); i < n; i++) {
