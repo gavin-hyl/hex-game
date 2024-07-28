@@ -1,6 +1,6 @@
 #include "board.hpp"
 
-Board::Board(int size, bool compact)
+Board::Board(int size)
     : size(size) {
     for (int i = -size; i <= size; i++) {
         for (int j = -size; j <= size; j++) {

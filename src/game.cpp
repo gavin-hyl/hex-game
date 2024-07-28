@@ -262,7 +262,7 @@ gold_t Game::player_prodution(player_id_t id) const
 }
 
 void Game::print() {
-    // clear_terminal();
+    clear_terminal();
     canvas.update(board.hexes);
     canvas.print();
     std::cout << "Turn " << turn << "\n";
