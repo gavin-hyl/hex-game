@@ -65,7 +65,7 @@ class Game {
                 PlayerAction(ActionCost(0, 1, 0),
                             "Attack a hex with a "+SWORD_STR+". If the hex is owned by another player,"
                             "reduce its " +  SHIELD_STR + " count by 1. If the " + SHIELD_STR + " is 0,"
-                            "gain control of the hex.",
+                            "that hex is neutralized.",
                             [this](){return this->check_attack();},
                             [this](){this->attack();})
             },

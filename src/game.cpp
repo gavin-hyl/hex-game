@@ -63,7 +63,7 @@ bool Game::next_turn() {
             std::cout << "Actions:\n";
             for (const auto& [name, action] : actions) {
                 std::cout << COLOR(BOLD, name) << ": " << action.description << "\n";
-                std::cout << "Cost: " << action.cost.to_string() << "\n";
+                std::cout << "Cost: " << action.cost.to_string() << "\n\n";
             }
             wait();
             continue;
