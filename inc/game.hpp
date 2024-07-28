@@ -10,13 +10,8 @@
 #include "ui.hpp"
 #include "tech.hpp"
 #include "board.hpp"
+#include "action.hpp"
 
-struct PlayerAction {
-    int cost;
-    std::function<bool()> act_fn;
-    std::string cost_description;
-    std::string description;
-};
 
 class Game {
     public:
@@ -27,48 +22,82 @@ class Game {
     private:
         Board board = Board();
         std::vector<Player> players;
-        const int NO_PLAYER = -1;
-        int current_player_idx = 0; 
-        int win_gold = 30;
+        GameHex* selected_hex = nullptr;
+        player_id_t current_id = 0;
         int turn = 0;
-        bool ended = false;
+
+        const static gold_t BASE_PROD = 3;
+
+        const static player_id_t NO_PLAYER = -1;
+        const static gold_t win_gold = 30;
         const static std::vector<double> prod_distribution;
-        const static std::vector<int> prod_values;
+        const static std::vector<gold_t> prod_values;
+        const static std::vector<std::string> capitals;
         Randomizer rng = Randomizer();
 
-        static const std::string ANNEX;
-        static const std::string ATTACK;
-        static const std::string SWORD;
-        static const std::string SHIELD;
-        static const std::string IMPROVE;
-        static const std::string TAKEOVER;
-        static const std::vector<std::string> action_strings;
-
         const std::map<std::string, PlayerAction> actions = {
-            {ANNEX, PlayerAction(5, [this](){return this->annex();}, COLOR(YELLOW, "5G"), "Annex a hex")},
-            {TAKEOVER, PlayerAction(5, [this](){return this->annex();}, COLOR(RED, "xx"), "Take over a hex")},
-            {SWORD, PlayerAction(5, [this](){return this->add_sword();}, COLOR(YELLOW, "5G"), "Add a sword to a hex")},
-            {SHIELD, PlayerAction(5, [this](){return this->add_shield();}, COLOR(YELLOW, "5G"), "Add a shield to a hex")},
-            {ATTACK, PlayerAction(0, [this](){return this->attack();}, COLOR(RED, "x"), "Attack a hex")},
-            {IMPROVE, PlayerAction(0, [this](){return this->improve();}, COLOR(BLUE, "oo"), "Increase production of a hex by 1")},
+            {
+                "annex", 
+                PlayerAction(ActionCost(3, 0, 0),
+                            "Instantly gain control of a hex.",
+                            [this](){return this->check_annex();},
+                            [this](){this->annex();})
+            },
+            {
+                "shield", 
+                PlayerAction(ActionCost(5, 0, 0),
+                            "Add a" + SHIELD_STR + "to a hex",
+                            [this](){return this->check_add_shield();},
+                            [this](){this->add_shield();})
+            },
+            {
+                "sword", 
+                PlayerAction(ActionCost(5, 0, 0),
+                            "Add a " + SWORD_STR + " to a hex",
+                            [this](){return this->check_add_sword();},
+                            [this](){this->add_sword();})
+            },
+            {
+                "attack", 
+                PlayerAction(ActionCost(0, 1, 0),
+                            "Attack a hex with a "+SWORD_STR+". If the hex is owned by another player,"
+                            "reduce its " +  SHIELD_STR + " count by 1. If the " + SHIELD_STR + " is 0,"
+                            "gain control of the hex.",
+                            [this](){return this->check_attack();},
+                            [this](){this->attack();})
+            },
+            {
+                "improve", 
+                PlayerAction(ActionCost(0, 1, 1),
+                            "Increase " + GOLD_STR + " of a hex by 1.",
+                            [this](){return this->check_improve();},
+                            [this](){this->improve();})
+            }
         };
 
+        bool check_annex();
+        void annex();
+        bool check_add_shield();
+        void add_shield();
+        bool check_add_sword();
+        void add_sword();
+        bool check_attack();
+        void attack();
+        bool check_improve();
+        void improve();
 
-        bool annex();
-        bool takeover();
-        bool add_shield();
-        bool add_sword();
-        bool attack();
-        bool improve();
+        bool affordable(const ActionCost& cost) const;
+        void incur(const ActionCost& cost);
 
         // bool research(Tech& tech);
 
         // const ACTION parse_action() const;
         const Tech& get_tech() const;
-        GameHex& get_hex();
+        GameHex& get_hex(std::string coords="");
 
         Player& current_player() const;
         const void next_player();
+        gold_t player_prodution(player_id_t id) const;
 
         bool accessible(const GameHex& hex, int dist=1) const;
 };

@@ -6,7 +6,7 @@
 #include <string>
 #include <sstream>
 
-#include "player.hpp"
+#include "gamedefs.hpp"
 
 struct Hex
 {
@@ -39,12 +39,12 @@ struct Hex
 
 struct GameHex : public Hex
 {
-    int production = 0;
-    int max_production = 3;
-    int shields = 0;
-    int max_shields = 3;
-    int swords = 0;
-    int max_swords = 3;
-    int owner = 0;
-    GameHex(int u, int v, int production=0, int owner=-1);
+    gold_t production = 0;
+    gold_t max_production = 3;
+    shield_t shields = 0;
+    shield_t max_shields = 3;
+    sword_t swords = 0;
+    sword_t max_swords = 3;
+    player_id_t owner = 0;
+    GameHex(int u, int v, gold_t production=0, player_id_t owner=-1);
 };

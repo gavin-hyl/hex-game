@@ -33,5 +33,5 @@ std::string Hex::pos() const {
 }
 
 
-GameHex::GameHex(int u, int v, int production, int owner)
+GameHex::GameHex(int u, int v, gold_t production, player_id_t owner)
     : Hex(u, v), production(production), owner(owner){ }

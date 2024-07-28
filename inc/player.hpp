@@ -5,9 +5,12 @@
 #include <iostream>
 
 #include "tech.hpp"
+#include "action.hpp"
+
+using player_id_t = char;
 
 struct Player {
-    int gold;
+    gold_t gold;
     std::set<Tech*> researched_techs;
     std::set<Tech*> potential_techs;
 

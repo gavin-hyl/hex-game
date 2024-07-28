@@ -7,6 +7,12 @@ std::string get_input(std::string prompt) {
     std::cout << prompt;
     std::cin >> action;
     return action;
+}
+void wait() {
+    std::string dummy;
+    std::cout << "Press enter to continue...";
+    std::getline(std::cin, dummy);
+    std::getline(std::cin, dummy);
 };
 
 void clear_terminal()
