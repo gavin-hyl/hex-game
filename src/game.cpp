@@ -2,7 +2,7 @@
 
 const std::vector<double> Game::prod_distribution = {0.85, 0.12, 0.03};
 const std::vector<gold_t> Game::prod_values = {0, 1, 2};
-
+const std::vector<HexPos> Game::capitals = {HexPos(0, -2), HexPos(0, 2)};
 
 Game::Game(int size, int players) {
     for (int i = 0; i < players; i++) {
@@ -16,14 +16,15 @@ Game::Game(int size, int players) {
             }
             int owner = NO_PLAYER;
             int prod = rng.rand_choose(prod_distribution, prod_values);
-            if (i == 0 && j == -2) {
-                owner = 1;
-                prod = 1;
-            } else if (i == 0 && j == 2) {
-                owner = 0;
-                prod = 1;
+            GameHex hex = GameHex(i, j);
+            if (hex == capitals[0]) {
+                hex.owner = 0;
+                hex.production = 1;
+            } else if (hex == capitals[1]) {
+                hex.owner = 1;
+                hex.production = 1;
             }
-            board.hexes.emplace_back(GameHex(i+size, j+size, prod, owner));
+            board.hexes.emplace_back(hex);
         }
     }
 }

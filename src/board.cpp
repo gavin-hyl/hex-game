@@ -81,6 +81,16 @@ void Board::place_hexagon(int row, int col,
     }
 }
 
+// GameHex &Board::get_hex(const HexPos &pos)
+// {
+//     for (GameHex &hex : hexes) {
+//         if (hex == pos) {
+//             return hex;
+//         }
+//     }
+//     throw std::invalid_argument("Invalid hex coords.");
+// }
+
 void Board::place_game_hex(const GameHex &hex)
 {
     std::stringstream pos;

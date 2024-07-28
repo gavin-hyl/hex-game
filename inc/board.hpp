@@ -37,6 +37,9 @@ class Board {
         void place_hexagon(int row, int col,
                            const std::vector<std::string>& text, 
                            const std::vector<color_t>& colors);
+
+        GameHex& get_hex(const HexPos& pos);
+        bool is_fair(const std::vector<HexPos>& capitals);
 };
 
 const static std::vector<std::string> HEXAGON = {
