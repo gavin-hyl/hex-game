@@ -23,13 +23,8 @@ struct HexPos
 
     HexPos(int u, int v);
 
-    int distance(const struct HexPos& b) const;
-
-    bool is_neighbor(const struct HexPos& b) const;
-
-    bool operator<(const HexPos& b) const {
-        return row < b.row || (row == b.row && col < b.col);
-    }
+    int distance(const HexPos& b) const;
+    bool is_neighbor(const HexPos& b) const;
 
     bool operator==(const HexPos& b) const {
         return u == b.u && v == b.v;
@@ -37,12 +32,13 @@ struct HexPos
 
     std::vector<HexPos> neighbors() const;
 
-    std::string pos() const;
+    std::string str() const;
 };
 
 
-struct GameHex : public HexPos
+struct GameHex
 {
+    HexPos pos;
     gold_t production = 0;
     gold_t max_production = 3;
     shield_t shields = 0;
@@ -50,5 +46,6 @@ struct GameHex : public HexPos
     sword_t swords = 0;
     sword_t max_swords = 3;
     player_id_t owner = 0;
+    player_id_t capital = 0;
     GameHex(int u, int v, gold_t production=0, player_id_t owner=-1);
 };

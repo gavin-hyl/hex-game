@@ -11,9 +11,12 @@
 
 class Board {
     public:
-        Board(std::vector<GameHex> hexes = {}, bool compact = true);
+        Board() = default;
+        Board(int size, bool compact = true);
         void print();
         std::vector<GameHex> hexes;
+        GameHex& get_hex(const HexPos& pos);
+        // std::vector<GameHex&> get_ring(HexPos center, int radius);
 
     private:
         // canvas is a 2D array of characters that represents the game board
@@ -38,8 +41,8 @@ class Board {
                            const std::vector<std::string>& text, 
                            const std::vector<color_t>& colors);
 
-        GameHex& get_hex(const HexPos& pos);
-        bool is_fair(const std::vector<HexPos>& capitals);
+        int size;
+        bool in_bounds(const HexPos& pos) const;
 };
 
 const static std::vector<std::string> HEXAGON = {

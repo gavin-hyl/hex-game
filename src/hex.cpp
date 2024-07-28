@@ -11,11 +11,11 @@ HexPos::HexPos(int u, int v, int w)
 HexPos::HexPos(int u, int v)
     : HexPos(u, v, -u-v) {}
 
-int HexPos::distance(const struct HexPos& b) const {
+int HexPos::distance(const HexPos& b) const {
     return (std::abs(u - b.u) + std::abs(v - b.v) + std::abs(w - b.w)) / 2;
 }
 
-bool HexPos::is_neighbor(const struct HexPos& b) const {
+bool HexPos::is_neighbor(const HexPos& b) const {
     return distance(b) == 1;
 }
 
@@ -26,7 +26,7 @@ std::vector<HexPos> HexPos::neighbors() const {
     };
 }
 
-std::string HexPos::pos() const {
+std::string HexPos::str() const {
     std::stringstream ss;
     ss << std::string(1, (u +'a')) << "-" << v;
     return ss.str();
@@ -34,4 +34,4 @@ std::string HexPos::pos() const {
 
 
 GameHex::GameHex(int u, int v, gold_t production, player_id_t owner)
-    : HexPos(u, v), production(production), owner(owner){ }
+    : pos(HexPos(u, v)), production(production), owner(owner){ }

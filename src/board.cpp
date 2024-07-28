@@ -1,12 +1,19 @@
 #include "board.hpp"
 
-Board::Board(std::vector<GameHex> hexes, bool compact) {
+Board::Board(int size, bool compact)
+    : size(size) {
     hex_width = compact ? HEX_WIDTH_COMPACT : HEX_WIDTH_SPACED;
     hex_height = compact ? HEX_HEIGHT_COMPACT : HEX_HEIGHT_SPACED;
-    this->hexes = hexes;
     reset_canvas();
+    for (int i = -size; i <= size; i++) {
+        for (int j = -size; j <= size; j++) {
+            if (!in_bounds(HexPos(i, j))) {
+                continue;
+            }
+            hexes.emplace_back(GameHex(i+size, j+size));
+        }
+    }
 }
-
 
 void Board::print_bound_line() {
     std::cout << "+";
@@ -31,6 +38,7 @@ void Board::update_canvas() {
         place_game_hex(hex);
     }
 }
+
 void Board::place_hexagon(int row, int col,
                           const std::vector<std::string>& text, 
                           const std::vector<std::string>& colors) {
@@ -81,20 +89,43 @@ void Board::place_hexagon(int row, int col,
     }
 }
 
-// GameHex &Board::get_hex(const HexPos &pos)
+bool Board::in_bounds(const HexPos &pos) const
+{
+    return (abs(pos.u + pos.v) <= size);
+}
+
+GameHex &Board::get_hex(const HexPos &pos)
+{
+    for (GameHex &hex : hexes) {
+        if (hex.pos == pos) {
+            return hex;
+        }
+    }
+    throw std::invalid_argument("Invalid hex coords.");
+}
+
+// std::vector<GameHex&> Board::get_ring(HexPos center, int radius)
 // {
-//     for (GameHex &hex : hexes) {
-//         if (hex == pos) {
-//             return hex;
-//         }
-//     }
-//     throw std::invalid_argument("Invalid hex coords.");
+    // if (radius < 0) {
+    //     throw std::invalid_argument("Radius must be non-negative.");
+    // }
+    // std::vector<GameHex &> ring;
+    // if (radius == 0) {
+    //     ring.emplace_back(get_hex(center));
+    // } else {
+    //     for (const GameHex& hex : hexes) {
+    //         if (center.distance(hex.pos) == radius) {
+    //             ring.emplace_back(hex);
+    //         }
+    //     }
+    // }
+    // return ring;
 // }
 
 void Board::place_game_hex(const GameHex &hex)
 {
     std::stringstream pos;
-    pos << std::string(1, (hex.u +'a')) << "-" << hex.v;
+    pos << std::string(1, (hex.pos.u +'a')) << "-" << hex.pos.v;
     std::string prod = std::string(hex.production, '+');
     std::string atk = std::string(hex.swords, 'x');
     std::string def = std::string(hex.shields, 'o');
@@ -104,7 +135,7 @@ void Board::place_game_hex(const GameHex &hex)
         pos_color = PLAYER_COLORS.at(hex.owner);
         prod_color = YELLOW;
     }
-    place_hexagon(hex.row, hex.col, {pos.str(), prod, atk, def}, {pos_color, prod_color, RED, BLUE});
+    place_hexagon(hex.pos.row, hex.pos.col, {pos.str(), prod, atk, def}, {pos_color, prod_color, RED, BLUE});
 }
 
 void Board::print() {

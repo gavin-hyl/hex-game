@@ -9,22 +9,19 @@ Game::Game(int size, int players) {
         this->players.emplace_back(Player());
     }
 
-    for (int i = -size; i <= size; i++) {
-        for (int j = -size; j <= size; j++) {
-            if (abs(i + j) > size) {
-                continue;
-            }
-            int owner = NO_PLAYER;
-            int prod = rng.rand_choose(prod_distribution, prod_values);
-            GameHex hex = GameHex(i, j);
-            if (hex == capitals[0]) {
-                hex.owner = 0;
-                hex.production = 1;
-            } else if (hex == capitals[1]) {
-                hex.owner = 1;
-                hex.production = 1;
-            }
-            board.hexes.emplace_back(hex);
+    board = Board(size);
+    // generate board with player-specific information
+    for (player_id_t i = 0; i < players; i++) {
+        HexPos capital_pos = capitals.at(i);
+        capital_pos.u += size;
+        capital_pos.v += size;
+        GameHex& capital_hex = board.get_hex(capital_pos);
+        capital_hex.owner = i;
+        capital_hex.capital = i;
+        // std::vector<GameHex&> ring1 = board.get_ring(capital_hex.pos, 1);
+        // std::vector<GameHex&> ring2 = board.get_ring(capital_hex.pos, 2);
+        for (int i = 0; i < 3; i++) {
+
         }
     }
 }
@@ -129,7 +126,7 @@ bool Game::check_attack()
     for (GameHex& hex : board.hexes) {
         if (hex.owner != current_id
             && hex.owner != NO_PLAYER
-            && hex.is_neighbor(*selected_hex)) {
+            && hex.pos.is_neighbor(selected_hex->pos)) {
             return true;
         }
     }
@@ -186,7 +183,7 @@ GameHex& Game::get_hex(std::string coords) {
         coords = get_input("coords: ");
     }
     for (GameHex& hex : board.hexes) {
-        if (hex.pos() == coords) {
+        if (hex.pos.str() == coords) {
             return hex;
         }
     }
@@ -228,7 +225,7 @@ void Game::print() {
 
 bool Game::accessible(const GameHex& hex, int dist) const {
     for (const GameHex& h : board.hexes) {
-        if (h.owner == current_id && h.distance(hex) <= dist) {
+        if (h.owner == current_id && h.pos.distance(hex.pos) <= dist) {
             return true;
         }
     }
