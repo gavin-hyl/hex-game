@@ -104,38 +104,41 @@ GameHex &Board::get_hex(const HexPos &pos)
     throw std::invalid_argument("Invalid hex coords.");
 }
 
-// std::vector<GameHex&> Board::get_ring(HexPos center, int radius)
-// {
-    // if (radius < 0) {
-    //     throw std::invalid_argument("Radius must be non-negative.");
-    // }
-    // std::vector<GameHex &> ring;
-    // if (radius == 0) {
-    //     ring.emplace_back(get_hex(center));
-    // } else {
-    //     for (const GameHex& hex : hexes) {
-    //         if (center.distance(hex.pos) == radius) {
-    //             ring.emplace_back(hex);
-    //         }
-    //     }
-    // }
-    // return ring;
-// }
+
+std::vector<GameHex*> Board::get_ring(HexPos center, int radius)
+{
+    if (radius < 0) {
+        throw std::invalid_argument("Radius must be non-negative.");
+    }
+    std::vector<GameHex*> ring;
+    if (radius == 0) {
+        ring.emplace_back(&get_hex(center));
+    } else {
+        for (GameHex& hex : hexes) {
+            if (center.distance(hex.pos) == radius) {
+                ring.emplace_back(&hex);
+            }
+        }
+    }
+    return ring;
+}
 
 void Board::place_game_hex(const GameHex &hex)
 {
-    std::stringstream pos;
-    pos << std::string(1, (hex.pos.u +'a')) << "-" << hex.pos.v;
+    std::string pos = hex.pos.str();
     std::string prod = std::string(hex.production, '+');
     std::string atk = std::string(hex.swords, 'x');
     std::string def = std::string(hex.shields, 'o');
     std::string pos_color = GRAY;
-    std::string prod_color = GRAY;
+    std::string prod_color = WHITE;
     if (hex.owner != -1) {
         pos_color = PLAYER_COLORS.at(hex.owner);
+        if (hex.capital != -1) {
+            pos = pos + "*";
+        }
         prod_color = YELLOW;
     }
-    place_hexagon(hex.pos.row, hex.pos.col, {pos.str(), prod, atk, def}, {pos_color, prod_color, RED, BLUE});
+    place_hexagon(hex.pos.row, hex.pos.col, {pos, prod, atk, def}, {pos_color, prod_color, RED, BLUE});
 }
 
 void Board::print() {

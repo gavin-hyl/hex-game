@@ -15,7 +15,7 @@ struct HexPos
     int v;
     int w;
 
-    // odd-q offset coordinates
+    // odd-q offset coordinates for rendering
     int row;
     int col;
 
@@ -40,12 +40,12 @@ struct GameHex
 {
     HexPos pos;
     gold_t production = 0;
-    gold_t max_production = 3;
+    gold_t max_production = 5;
     shield_t shields = 0;
     shield_t max_shields = 3;
     sword_t swords = 0;
     sword_t max_swords = 3;
     player_id_t owner = 0;
-    player_id_t capital = 0;
+    player_id_t capital = -1;
     GameHex(int u, int v, gold_t production=0, player_id_t owner=-1);
 };

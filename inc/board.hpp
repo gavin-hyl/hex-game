@@ -16,7 +16,7 @@ class Board {
         void print();
         std::vector<GameHex> hexes;
         GameHex& get_hex(const HexPos& pos);
-        // std::vector<GameHex&> get_ring(HexPos center, int radius);
+        std::vector<GameHex*> get_ring(HexPos center, int radius);
 
     private:
         // canvas is a 2D array of characters that represents the game board

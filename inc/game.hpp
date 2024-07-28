@@ -32,7 +32,8 @@ class Game {
         const static gold_t win_gold = 30;
         const static std::vector<double> prod_distribution;
         const static std::vector<gold_t> prod_values;
-        const static std::vector<HexPos> capitals;
+        const static std::vector<HexPos> capitals_rel;
+        std::vector<HexPos> capitals;
 
         Randomizer rng = Randomizer();
 

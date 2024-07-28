@@ -2,26 +2,46 @@
 
 const std::vector<double> Game::prod_distribution = {0.85, 0.12, 0.03};
 const std::vector<gold_t> Game::prod_values = {0, 1, 2};
-const std::vector<HexPos> Game::capitals = {HexPos(0, -2), HexPos(0, 2)};
+const std::vector<HexPos> Game::capitals_rel = {HexPos(0, -3), HexPos(0, 3)};
 
 Game::Game(int size, int players) {
     for (int i = 0; i < players; i++) {
         this->players.emplace_back(Player());
     }
 
+    for (const HexPos& capital_rel : capitals_rel) {
+        capitals.push_back(HexPos(capital_rel.u + size, capital_rel.v + size));
+    }
+
     board = Board(size);
     // generate board with player-specific information
     for (player_id_t i = 0; i < players; i++) {
         HexPos capital_pos = capitals.at(i);
-        capital_pos.u += size;
-        capital_pos.v += size;
         GameHex& capital_hex = board.get_hex(capital_pos);
         capital_hex.owner = i;
         capital_hex.capital = i;
-        // std::vector<GameHex&> ring1 = board.get_ring(capital_hex.pos, 1);
-        // std::vector<GameHex&> ring2 = board.get_ring(capital_hex.pos, 2);
-        for (int i = 0; i < 3; i++) {
-
+        capital_hex.production = 3;
+        std::vector<GameHex*> ring1 = rng.rand_choose_noreplace(board.get_ring(capital_hex.pos, 1), 3);
+        std::vector<GameHex*> ring2 = rng.rand_choose_noreplace(board.get_ring(capital_hex.pos, 2), 3);
+        for (GameHex* hex : ring1) {
+            hex->production = 1;
+        }
+        for (GameHex* hex : ring2) {
+            hex->production = 2;
+        }
+    }
+    // populate the rest of the board with random production values
+    for (GameHex& hex : board.hexes) {
+        bool close_to_capital = false;
+        for (const HexPos& capital_pos : capitals) {
+            if (hex.pos.distance(capital_pos) <= 2) {
+                close_to_capital = true;
+                std::cout << "close\n";
+                break;
+            }
+        }
+        if (!close_to_capital) {
+            hex.production = rng.rand_choose(prod_values, prod_distribution);
         }
     }
 }
