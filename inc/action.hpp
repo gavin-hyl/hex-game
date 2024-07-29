@@ -11,7 +11,7 @@ struct ActionCost {
     sword_t swords;
     shield_t shields;
 
-    const std::string to_string() const;
+    const std::string str() const;
 };
 
 

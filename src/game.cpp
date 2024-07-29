@@ -63,7 +63,7 @@ bool Game::next_turn() {
             std::cout << "Actions:\n";
             for (const auto& [name, action] : actions) {
                 std::cout << COLOR(BOLD, name) << ": " << action.description << "\n";
-                std::cout << "Cost: " << action.cost.to_string() << "\n";
+                std::cout << "Cost: " << action.cost.str() << "\n";
             }
             wait();
             continue;
@@ -207,7 +207,7 @@ bool Game::check_improve()
 
 void Game::improve()
 {
-    selected_hex->production += 1;
+    selected_hex->production += 2;
 }
 
 

@@ -28,7 +28,7 @@ std::vector<HexPos> HexPos::neighbors() const {
 
 std::string HexPos::str() const {
     std::stringstream ss;
-    ss << std::string(1, (u +'a')) << v;
+    ss << std::string(1, (row +'a')) << col;
     return ss.str();
 }
 

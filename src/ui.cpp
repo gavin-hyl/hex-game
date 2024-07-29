@@ -126,15 +126,26 @@ void Canvas::place_game_hex(const GameHex &hex)
 }
 
 void Canvas::print() {
-    print_bound_line();
+    // print_bound_line();
     for (int row = 0; row < Canvas::CANVAS_HEIGHT; row++) {
-        std::cout << "|";
+        bool line_empty = true;
+        for (int col = 0; col < Canvas::CANVAS_WIDTH; col++) {
+            if (this->canvas[row][col] != ' ') {
+                line_empty = false;
+                break;
+            }
+        }
+        if (line_empty) {
+            continue;
+        }
+        // std::cout << "|";
         for (int col = 0; col < Canvas::CANVAS_WIDTH; col++) {
             char c = this->canvas[row][col];
             color_t color = (GRID_CHARS.find(c) != GRID_CHARS.end()) ? GRAY : this->canvas_colors[row][col];
             std::cout << color << c;
         }
-        std::cout << RESET << "|\n";
+        std::cout << RESET << "\n";
+        // std::cout << RESET << "|\n";
     }
-    print_bound_line();
+    // print_bound_line();
 }

@@ -18,7 +18,7 @@ public:
     void print();
 
     // canvas is a 2D array of characters that represents the game board
-    const static int CANVAS_HEIGHT = 50;
+    const static int CANVAS_HEIGHT = 60;
     const static int CANVAS_WIDTH = 120;
     char canvas[CANVAS_HEIGHT][CANVAS_WIDTH];
     color_t canvas_colors[CANVAS_HEIGHT][CANVAS_WIDTH];

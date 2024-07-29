@@ -4,7 +4,7 @@
 
 int main()
 {
-    Game game(5, 2);
+    Game game(3, 2);
     game.print();
     while (1)
     {
