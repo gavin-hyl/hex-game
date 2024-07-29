@@ -114,24 +114,27 @@ bool Game::next_turn() {
                     frontier.emplace_back(hex);
                 }
             }
-
-            // testing
-            for (GameHex* hex : frontier) {
-                std::cout << hex->pos.str() << " ";
-            }
-            for (GameHex* hex : visited) {
-                std::cout << hex->pos.str() << " ";
+        }
+        bool player_dead = true;
+        for (GameHex& hex: board.hexes) {
+            if (hex.owner == i) {
+                if (std::find(visited.begin(), visited.end(), &hex) == visited.end()) {
+                    hex.owner = NO_PLAYER;
+                } else {
+                    player_dead = false;
+                }    
             }
         }
-        for (GameHex& hex: board.hexes) {
-            if ((std::find(visited.begin(), visited.end(), &hex) == visited.end())
-                && (hex.owner == i)) {
-                hex.owner = NO_PLAYER;
-            }
+        if (player_dead) {
+            dead_players.push_back(i);
         }
     }
 
-    current_id = (current_id + 1) % players.size();
+    if (dead_players.size() == players.size() - 1) {
+        return true;
+    }
+
+    next_player();
     turn++;
     return false;
 }
@@ -245,7 +248,14 @@ GameHex& Game::get_hex(std::string coords) {
     throw std::invalid_argument("Invalid hex coords.");
 }
 
-inline Player& Game::current_player() const
+void Game::next_player()
+{
+    do {
+        current_id = (current_id + 1) % players.size();
+    } while (std::find(dead_players.begin(), dead_players.end(), current_id) != dead_players.end());
+}
+
+inline Player &Game::current_player() const
 {
     return const_cast<Player&>(players.at(current_id));
 }

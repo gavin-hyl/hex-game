@@ -23,6 +23,7 @@ class Game {
         Board board = Board();
         Canvas canvas = Canvas();
         std::vector<Player> players;
+        std::vector<player_id_t> dead_players;
         GameHex* selected_hex = nullptr;
         player_id_t current_id = 0;
         int turn = 0;
@@ -49,7 +50,7 @@ class Game {
             {
                 "shield", 
                 PlayerAction(ActionCost(5, 0, 0),
-                            "Add a" + SHIELD_STR + "to a hex",
+                            "Add a " + SHIELD_STR + " to a hex",
                             [this](){return this->check_add_shield();},
                             [this](){this->add_shield();})
             },
@@ -98,6 +99,7 @@ class Game {
         const Tech& get_tech() const;
         GameHex& get_hex(std::string coords="");
 
+        void next_player();
         Player& current_player() const;
         gold_t player_prodution(player_id_t id) const;
 

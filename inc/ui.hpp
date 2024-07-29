@@ -24,8 +24,8 @@ public:
     color_t canvas_colors[CANVAS_HEIGHT][CANVAS_WIDTH];
 
     // settings for hexagon placement
-    const static int HEX_HEIGHT_COMPACT = 4;
-    const static int HEX_WIDTH_COMPACT = 8;
+    const static int HEX_HEIGHT_COMPACT = 6;
+    const static int HEX_WIDTH_COMPACT = 11;
     const static int HEX_HEIGHT_SPACED = 5;
     const static int HEX_WIDTH_SPACED = 10;
     size_t hex_width, hex_height;
@@ -41,11 +41,13 @@ public:
 };
 
 const static std::vector<std::string> HEXAGON = {
-    "  ______  ",
-    " / 0000 \\ ",
-    "/ 111111 \\",
-    "\\ 222333 /",
-    " \\______/ "
+    R"(    ________   )",
+    R"(   / 0000   \  )",
+    R"(  / 111111   \ )",
+    R"( / 111111     \)",
+    R"( \ 111111     /)",
+    R"(  \ 222333   / )",
+    R"(   \________/  )"
 };
 
 const static std::unordered_set<char> GRID_CHARS = {'\\', '_', '/'};
