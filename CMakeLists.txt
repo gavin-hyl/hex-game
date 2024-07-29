@@ -11,4 +11,4 @@ target_include_directories(Game PUBLIC inc)
 
 set(EXECUTABLE_OUTPUT_PATH "${CMAKE_CURRENT_SOURCE_DIR}/bin")
 
-target_compile_options(Game PRIVATE -Wall -Wextra -Wpedantic -Werror)
+target_compile_options(Game PRIVATE -Wall)

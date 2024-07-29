@@ -6,7 +6,7 @@
 #include <string>
 #include <sstream>
 
-#include "gamedefs.hpp"
+#include "types.hpp"
 
 struct HexPos
 {

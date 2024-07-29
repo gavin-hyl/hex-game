@@ -4,25 +4,16 @@
 #include <functional>
 
 #include "colors.hpp"
-
-using gold_t = unsigned int;
-using sword_t = unsigned int;
-using shield_t = unsigned int;
+#include "types.hpp"
 
 struct ActionCost {
     gold_t gold;
     sword_t swords;
     shield_t shields;
 
-    ActionCost(gold_t gold, sword_t swords, shield_t shields) 
-        : gold(gold), swords(swords), shields(shields) {}
-    
-    std::string to_string() const {
-        return COLOR(YELLOW, std::string(gold, '+'))
-                + COLOR(RED, std::string(swords, 'x'))
-                + COLOR(BLUE, std::string(shields, 'o'));
-    }
+    const std::string to_string() const;
 };
+
 
 struct PlayerAction {
     ActionCost cost;

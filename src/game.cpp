@@ -21,8 +21,8 @@ Game::Game(int size, int players) {
         capital_hex.owner = i;
         capital_hex.capital = i;
         capital_hex.production = 3;
-        std::vector<GameHex*> ring1 = rng.rand_choose_noreplace(board.get_ring(capital_hex.pos, 1), 3);
-        std::vector<GameHex*> ring2 = rng.rand_choose_noreplace(board.get_ring(capital_hex.pos, 2), 3);
+        auto ring1 = rng.rand_choose_noreplace(board.get_ring(capital_hex.pos, 1), 3);
+        auto ring2 = rng.rand_choose_noreplace(board.get_ring(capital_hex.pos, 2), 3);
         for (GameHex* hex : ring1) {
             hex->production = 1;
         }
@@ -97,7 +97,7 @@ bool Game::next_turn() {
         incur(valid_actions[action_idx].cost);
     }
 
-    for (player_id_t i = 0; i < players.size(); i++) {
+    for (uint8_t i = 0; i < players.size(); i++) {
         if (i == current_id) {
             continue;
         }

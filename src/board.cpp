@@ -12,7 +12,7 @@ Board::Board(int size)
     }
 }
 
-bool Board::in_bounds(const HexPos &pos) const
+const bool Board::in_bounds(const HexPos &pos) const
 {
     return (abs(pos.u + pos.v) <= size);
 }
